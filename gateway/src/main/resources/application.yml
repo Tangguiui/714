@@ -1,0 +1,48 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: oa-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+        group: DEFAULT_GROUP
+      config:
+        server-addr: localhost:8848
+        file-extension: yml
+        namespace: public
+        group: DEFAULT_GROUP
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 员工服务路由
+        - id: emp-service
+          uri: lb://oa-emp-service
+          predicates:
+            - Path=/api/v1/employee/**
+        # 管理员服务路由
+        - id: admin-service
+          uri: lb://oa-admin-service
+          predicates:
+            - Path=/api/v1/admin/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            exposedHeaders: "*"
+
+# 日志配置
+logging:
+  level:
+    com.oa.gateway: debug
+    org.springframework.cloud.gateway: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n' 
